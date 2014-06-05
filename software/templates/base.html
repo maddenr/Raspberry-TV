@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+	<head>
+		<!--
+		jquery
+		twitter bootstrap?
+		base css
+		base js
+		-->
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/kube.min.css') }}"/>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+		
+		{% block addToHead %}
+		{% endblock %}
+	</head>
+	<body id="bgrd" class="width-100">
+		<img class="logo" src="{{ url_for('static', filename='images/logo-hollow.png') }}" />
+		{% block body %}
+		{% endblock %}
+	</body>
+	<footer>
+		<script src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/jquery-color.min.js') }}"></script>
+		{% block addToFooter %}
+			<script>
+				// bind the controller things to a key press and then execute it from the embedded browser
+				//write path to a file and then read the file when serving content
+				$(document).ready(function(){
+					$(window).keydown(function(event){
+					switch(event.keyCode){
+						case 89:			//y key for YouTube action
+							break;
+						case 76:			//l key for local media action
+							$.ajax({
+								
+								
+							});
+							break;
+					};
+					
+				});
+				});
+			</script>
+		{% endblock %}
+		<!-- copyright info -->
+		<!-- javascript color changing background gradient rgb(202,29,29) -> rgb(255,255,255) bring whit to red and then other red to white. repeat-->
+		<script>
+		$(document).ready(function(){
+			//encapsulates the javascript background
+			var background = (function(){
+				cycleBackground = function() {
+					window.setTimeout(function(){
+						$('#bgrd').animate({backgroundColor: '#rgb(203,0,0)'}, 20000);
+					}, 10000);
+					//10sec pause, 20 sec transition
+					window.setTimeout(function(){
+						$('#bgrd').css('background', 'rgba(203,0,0,1) linear-gradient(135deg, rgba(0,0,0,0), rgba(203,0,0,1))');
+					}, 40000);
+					//10 sec pause
+					window.setTimeout(function(){
+						$('#bgrd').animate({backgroundColor: '#rgb(255,255,255)'}, 20000);
+					}, 40000);
+					//20sec transition, 60sec total
+				}
+				var backgroundInterval;
+				return {
+					'start': function(){
+						cycleBackground();
+						backgroundInterval = window.setInterval(function(){
+							cycleBackground();
+						}, 60000);
+					},
+					'stop': function(){
+						if (backgroundInterval == undefined) return; //this will only clear the last interval set the others go into the aether
+						clearInterval(backgroundInterval);
+					}
+				};
+			})();
+			
+			//encapsulate the weather actions
+			var ctiy="Boston"
+			var weather = (function(){
+				
+				return {
+					'request' : function(city){
+						$.ajax({
+								url:"http://api.openweathermap.org/data/2.5/forecast/daily?q="+city+"&mode=json&units=imperial&cnt=7",
+								cache: true
+						}).done(function(data){
+							console.log(data);
+							
+						}).fail(function(){
+							console.log("Nooooo");
+						});
+					}
+				};
+				
+			})();
+			weather.request("Boston");
+		});
+		</script>
+	</footer>
+</html>

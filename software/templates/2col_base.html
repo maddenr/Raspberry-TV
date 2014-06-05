@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<center class="width-100 twocolcenter">
+	<div class="units-row appbox">
+		<div class="unit-60 weatherBox">
+			
+		</div>
+		<div class="unit-40">
+			<div id="streamingServices">
+				<div>
+					<button id="localMediaStream" class="streamAnchor" />
+				</div>
+				<div>
+					<button id="youTubeStream" class="streamAnchor"/>
+				</div>
+			</div>
+		</div>
+	</div>
+</center>
+<!-- two column layout & ajax reload, send template render as text and send and insert as html how do headers? -->
+<div id="modalWindow" class="hidden">
+	<!-- fetch modals with ajax -->
+</div>
+{% endblock %}
+
+{% block addToFooter %}
+	{{super()}}
+{% endblock %}

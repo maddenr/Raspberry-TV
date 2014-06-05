@@ -1,0 +1,12 @@
+{% extends "modalBase.html" %}
+{% block modalContent %}
+	<ul>
+		{% for item in listLocalMedia() %}
+			<li>
+				item should be a tuple with the type and path, send a request to this template with that path list files and send it back
+				
+				THIS SHOULD BE DONE BY THE APP NOT THIS SIDE
+			</li>
+		{% endfor %}
+	</ul>
+{% endblock %}
