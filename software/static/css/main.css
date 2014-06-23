@@ -1,3 +1,8 @@
+h1, h2, h3, h4,  h5, h6 {
+	color: inherit;
+}
+
+
 body#bgrd {
 	background: linear-gradient(135deg, rgb(203,0,0), rgba(0,0,0,0));
 	height: 790px;
@@ -23,8 +28,6 @@ body#bgrd .twocolcenter .appbox {
 	background-color: #444444;
 	//opacity: 0.85;
 	
-	//change opacity??
-	
 	border-radius: 5px;
 	border: solid 1px #333333;
 	box-shadow: #333333 0px 3px 10px 5px;
@@ -38,7 +41,7 @@ body#bgrd .twocolcenter .appbox .weatherBox {
 }
 
 .hidden {
-visibility: none;
+display: none;
 }
 
 #streamingServices {
@@ -66,4 +69,27 @@ button#youTubeStream {
 
 button#localMediaStream {
 	background-image: url('/static/images/local-media-icon.png');
+}
+.weatherBox {
+	color: #FFF;
+}
+
+#weatherLocation {
+	height: 15%;
+}
+
+#todaysForcast {
+	height: 25%;
+}
+
+#weekForcast {
+	height: 60%;
+}
+
+#modalWindow {
+	background-color: rgba(0,0,0,.2);
+	position:relative;
+	left: 50%;
+	top: 50%;
+	z-index:1;
 }

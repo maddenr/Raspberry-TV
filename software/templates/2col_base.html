@@ -3,7 +3,30 @@
 <center class="width-100 twocolcenter">
 	<div class="units-row appbox">
 		<div class="unit-60 weatherBox">
-			
+			<div id="weatherLocation">
+				<h1 class="cityName">
+					
+				</h1>
+				<div class="coordinates">
+					
+				</div>
+			</div>
+			<div id="todaysForcast">
+				<!-- same as 6 days but bigger and centered  -->
+				<div class="tempColumn">
+					<h2 class="minTemp">
+						weatherData.list[0].temp.min
+					</h2>
+					<h2 class="maxTemp">
+						weatherData.list[0].temp.max
+					</h2>
+				</div>
+				<div class="auxInfoColumn">
+					
+				</div>	
+			</div>
+			<table id="weekForcast">
+			</table>
 		</div>
 		<div class="unit-40">
 			<div id="streamingServices">
@@ -18,11 +41,48 @@
 	</div>
 </center>
 <!-- two column layout & ajax reload, send template render as text and send and insert as html how do headers? -->
-<div id="modalWindow" class="hidden">
-	<!-- fetch modals with ajax -->
-</div>
 {% endblock %}
 
 {% block addToFooter %}
 	{{super()}}
+	<script>
+	$(document).ready(function(){
+		var ctiy="Boston"
+		var weather = (function(){
+			var weatherData='';
+			var format = {
+				'fillCurrentCityBox': function (){
+					$("#weatherLocation .cityName").text(weatherData.city.name+", "+weatherData.city.country);
+					$("#weatherLocation .coordinates").text(weatherData.city.coord.lat+", "+weatherData.city.coord.lon);
+				},
+				'fillTodaysForcast': function (){
+					$("#todaysForcast .tempColumn .maxTemp").text("Max: "+weatherData.list[0].temp.max);
+					$("#todaysForcast .tempColumn .minTemp").text("Min: "+weatherData.list[0].temp.min);
+				},
+				'fillWeekForcast': function (){
+					var forcast = $("#weekForcast");
+					for(var i=1; i<7; i++){
+						forcast.appendTo(weatherData.temp[i])
+					}
+				}
+			};
+			return {
+				'request' : function(city){
+					$.ajax({
+							url:"http://api.openweathermap.org/data/2.5/forecast/daily?q="+city+",us&mode=json&units=imperial&cnt=7",
+							cache: true
+					}).done(function(data){
+						weatherData = data;
+						format.fillCurrentCityBox();
+						console.log(weatherData);
+						format.fillTodaysForcast();
+					}).fail(function(){
+						console.log("Nooooo");
+					});
+				}
+			};
+		})();
+		weather.request("Boston");
+	});
+	</script>
 {% endblock %}

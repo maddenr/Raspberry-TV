@@ -17,6 +17,9 @@
 		<img class="logo" src="{{ url_for('static', filename='images/logo-hollow.png') }}" />
 		{% block body %}
 		{% endblock %}
+		<div id="modalWindow" class="hidden">
+		<!-- fetch modals with ajax -->
+		</div>
 	</body>
 	<footer>
 		<script src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
@@ -32,10 +35,14 @@
 							break;
 						case 76:			//l key for local media action
 							$.ajax({
-								
-								
+								url: "/loadMedia"	
+							}).done(function(data){
+								console.log(data);
 							});
 							break;
+						case 99:			//some key for weather refresh
+							break;
+						case 999:			//some key for 
 					};
 					
 				});
@@ -77,26 +84,6 @@
 				};
 			})();
 			
-			//encapsulate the weather actions
-			var ctiy="Boston"
-			var weather = (function(){
-				
-				return {
-					'request' : function(city){
-						$.ajax({
-								url:"http://api.openweathermap.org/data/2.5/forecast/daily?q="+city+"&mode=json&units=imperial&cnt=7",
-								cache: true
-						}).done(function(data){
-							console.log(data);
-							
-						}).fail(function(){
-							console.log("Nooooo");
-						});
-					}
-				};
-				
-			})();
-			weather.request("Boston");
 		});
 		</script>
 	</footer>
