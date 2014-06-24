@@ -1,0 +1,8 @@
+{
+	"success" : {{ jsonSuccessEvaluation(status) }},
+	"data": {
+		{% block data %}
+			{{ payload }}
+		{% endblock %}
+	}
+}

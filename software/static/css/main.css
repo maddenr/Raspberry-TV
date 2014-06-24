@@ -5,7 +5,31 @@ h1, h2, h3, h4,  h5, h6 {
 
 body#bgrd {
 	background: linear-gradient(135deg, rgb(203,0,0), rgba(0,0,0,0));
+	height: 740px;
+}
+.visBox{
+	position:absolute;
+	z-index: 1;
 	height: 790px;
+	top: 0px;
+	left: 0px;
+	background-color: #FFFFFF;
+	display: none;
+}
+.visBox div {
+	position: absolute;
+	width: inherit;
+	height: inherit;
+	top: 0px;
+	left: 0px;
+}
+.visBox #vis1 {
+	background: linear-gradient(135deg, rgb(203,0,0), rgba(0,0,0,0));
+	
+}
+.visBox #vis2 {
+	background: linear-gradient(225deg, rgb(0,0,203), rgb(0,0,0,0));
+	
 }
 
 body#bgrd img.logo {
@@ -88,8 +112,22 @@ button#localMediaStream {
 
 #modalWindow {
 	background-color: rgba(0,0,0,.2);
-	position:relative;
-	left: 50%;
-	top: 50%;
+	position:absolute;
+	left: 0px;
+	top: 0px;
+	height: 100%;
+	width: 100%;
 	z-index:1;
+}
+
+#modalWindow #loadingBox {
+	width: 20%;
+	height: 11%;
+	position: relative;
+	top: 40%;
+	left: 40%;
+	border-radius: 5px;
+	background-color: #CCCCCC;
+	padding: 2% 0% 1% 4%;
+	font-size: 60px;
 }

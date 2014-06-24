@@ -19,6 +19,15 @@
 		{% endblock %}
 		<div id="modalWindow" class="hidden">
 		<!-- fetch modals with ajax -->
+			<div id="loadingBox">
+				Loading
+			</div>
+		</div>
+		<div class="visBox">
+			<div id="vis1">
+			</div>
+			<div id="vis2">
+			</div>
 		</div>
 	</body>
 	<footer>
@@ -30,19 +39,80 @@
 				//write path to a file and then read the file when serving content
 				$(document).ready(function(){
 					$(window).keydown(function(event){
+					console.log(event.keyCode);
 					switch(event.keyCode){
 						case 89:			//y key for YouTube action
-							break;
-						case 76:			//l key for local media action
 							$.ajax({
-								url: "/loadMedia"	
+								url: "/YTDownload"
+							}).done(function(data){
+								//start the polling here
+								console.log(data);
+							});
+							break;
+						case 68:			//d for isDownloading
+							$.ajax({
+								url: "/isDownloading"
 							}).done(function(data){
 								console.log(data);
 							});
 							break;
-						case 99:			//some key for weather refresh
+						case 76:			//l key for load media
+							$.ajax({
+								url: "/loadMedia"
+							}).done(function(data){
+								console.log(data);
+								//if audio start visualizer
+							});
 							break;
-						case 999:			//some key for 
+						case 80:			//p for pause
+							$.ajax({
+								url: "/mediaPlayerAction/pause"
+							}).done(function(data){
+								console.log(data);
+							});
+							break;
+						case 219:			//[ for play
+							$.ajax({
+								url: "/mediaPlayerAction/play"
+							}).done(function(data){
+								console.log(data);
+							});
+							break;
+						case 37:			//left arrow, skip back
+							$.ajax({
+								url: "/skipPlaybackInterval/backward"
+							}).done(function(data){
+								console.log(data);
+							});
+							break;
+						case 39:			//right arrow, skip ahead
+							$.ajax({
+								url: "/skipPlaybackInterval/forward"
+							}).done(function(data){
+								console.log(data);
+							});
+							break;
+						case 77:			//m for mute
+							$.ajax({
+								url: "/mediaPlayerAction/mute"
+							}).done(function(data){
+								console.log(data);
+							});
+							break;
+						case 188:			//, for unmute
+							$.ajax({
+								url: "/mediaPlayerAction/unmute"
+							}).done(function(data){
+								console.log(data);
+							});
+							break;
+						case 83:			//s for stop (closes window)
+							$.ajax({
+								url: "/mediaPlayerAction/stop"
+							}).done(function(data){
+								console.log(data);
+							});
+							break;
 					};
 					
 				});
@@ -57,15 +127,15 @@
 			var background = (function(){
 				cycleBackground = function() {
 					window.setTimeout(function(){
-						$('#bgrd').animate({backgroundColor: '#rgb(203,0,0)'}, 20000);
+						$('#bgrd').animate({backgroundColor: 'rgb(203,0,0)'}, 20000);
 					}, 10000);
 					//10sec pause, 20 sec transition
 					window.setTimeout(function(){
-						$('#bgrd').css('background', 'rgba(203,0,0,1) linear-gradient(135deg, rgba(0,0,0,0), rgba(203,0,0,1))');
+						$('#bgrd').css('background', 'linear-gradient(135deg, rgba(0,0,0,0), rgba(203,0,0,1))');
 					}, 40000);
 					//10 sec pause
 					window.setTimeout(function(){
-						$('#bgrd').animate({backgroundColor: '#rgb(255,255,255)'}, 20000);
+						$('#bgrd').animate({backgroundColor: 'rgb(255,255,255)'}, 20000);
 					}, 40000);
 					//20sec transition, 60sec total
 				}
@@ -84,6 +154,41 @@
 				};
 			})();
 			
+			
+			var visualizer = (function(){
+				cycleVis = function() {
+					window.setTimeout(function(){
+						$('#vis1').animate({backgroundColor: '#rgb(203,0,0)'}, 5000);
+						$('#vis2').animate({backgroundColor: '#rgb(0,0,203)'}, 5000);
+					}, 1000);
+					//5sec pause, 10 sec transition
+					window.setTimeout(function(){
+						$('#vis1').css('background', 'linear-gradient(135deg, rgba(255,255,255,0), rgba(203,0,0,1))');
+						$('#vis2').css('background', 'linear-gradient(225deg, rgba(0,0,0,0), rgba(0,0,203,1))');
+					}, 7000);
+					//5 sec pause
+					window.setTimeout(function(){
+						$('#vis1').animate({backgroundColor: '#rgb(255,255,255)'}, 5000);
+						$('#vis2').animate({backgroundColor: '#rgb(0,0,0)'}, 5000);
+					}, 7000);
+					//10sec transition, 30sec total
+				}
+				var visInterval;
+				return {
+					'start': function(){
+						cycleVis();
+						visInterval = window.setInterval(function(){
+							cycleVis();
+						}, 12000);
+						//unhide the window
+					},
+					'stop': function(){
+						if (backgroundInterval == undefined) return; //this will only clear the last interval set the others go into the aether
+						clearInterval(visInterval);
+						//hide the window
+					}
+				};
+			})();
 		});
 		</script>
 	</footer>

@@ -3,16 +3,17 @@ import os.path as path
 import os
 import re
 import vlc
+from subprocess import call, Popen
 app = Flask(__name__)
-app.root_path = path.dirname(__file__)#path.abspath(path.dirname(__file__))
+app.root_path = path.abspath(path.dirname(__file__)).replace("\\","/")
 app.media_path = app.root_path+"/content/local-media"#path.join(app.root_path, "content", "local-media")
 #create custom 404 page for friendly faults and then have an ajax for internet connection check (succeed reload old url, failure report)
 streams = [ ('localMedia', 'images/local-media-icon.png'),
 		('youtube', 'images/youtube-icon.png')  ]
 		
-i = vlc.Instance()
+i = vlc.Instance("--video-on-top")
 mediaPlayer = i.media_player_new()
-
+app.download = None
 
 @app.route("/")
 #return the app itself
@@ -22,48 +23,68 @@ def index():
 	
 @app.route("/mediaPlayerAction/<string:action>")
 def mediaPlayerAction(action):
-	if action is "fullscreen":
-		mediaPlayer.toggle_fullscreen()
-	elif action is "play":
-		if mediaPlayer.get_state() is vlc.State.Ended:
+	if action == "play":
+		if mediaPlayer.get_state() == vlc.State.Ended:
 			mediaPlayer.stop()
-		mediaPlayer.set_pause(False)
-	elif action is "pause":
+		if mediaPlayer.get_state() == vlc.State.Stopped:
+			mediaPlayer.play()
+		else:
+			mediaPlayer.set_pause(False)
+	elif action == "pause":
 		mediaPlayer.set_pause(True)
-	elif action is "stop":
+	elif action == "stop":
 		mediaPlayer.stop()
-	elif action is "mute":
+	elif action == "mute":
 		mediaPlayer.audio_set_mute(True)
-	elif action is "unmute":
+	elif action == "unmute":
 		mediaPlayer.audio_set_mute(False)
-		
+	else:
+		return render_template("base.json", status=False)
+	return render_template("base.json", status=True)
+
+	
+	
 	
 @app.route("/loadMedia")
 def loadMedia():
-	mediaPath = open(path.join(app.root_path,"path.txt")).readLine()
+	if path.isfile(app.root_path+"/path.txt") is not True:
+		return render_template("base.json", status=False, payload='"reason":"no file"')
+		
+	mediaPath = app.media_path+"/"+open(app.root_path+"/path.txt").readline()
+	
 	if path.isfile(mediaPath) is not True:
-		abort(404)
+		return render_template("base.json", status=False, payload='"reason":"media not there"')
 	elif mediaPlayer.get_state() is not vlc.State.Ended:
 		mediaPlayer.stop()
-	mediaPlayer.set_media(i.media_new("file:///"+app.media_path+"/"+mediaPath))
+		
+	mediaPlayer.set_media(i.media_new("file:///"+mediaPath))
 	mediaPlayer.play()
+	mediaPlayer.set_fullscreen(True)
+	return render_template("base.json", status=True)
+	# return JSON response
 	#make sure that things are displayed alphabetically, use numbers to sort track numbers... this is where we add tracks to play and album
 	
 	
 @app.route("/setVolume/<int:volume>")
 def setVolume(volume):
 	mediaPlayer.audio_set_volume(volume)
+	return render_template("base.json", status=True)
 	
 	
 @app.route("/skipPlaybackInterval/<string:direction>")
-def setVolume(volume):
-	mediaPlayer.set_pause(True)
-	if direction is "forward":
-		mediaPlayer.set_time(mediaPlayer.getTime()+300000)
-	elif direction is "backward"
-		mediaPlayer.set_time(mediaPlayer.getTime()-300000)
+def skipPlayback(direction):
+	if mediaPlayer.get_state() == vlc.State.NothingSpecial:
+		return render_template("base.json", status=False)
+	
+	#mediaPlayer.set_pause(True)
+	if direction == "forward":
+		mediaPlayer.set_time(mediaPlayer.get_time()+300000)
+	elif direction == "backward":
+		mediaPlayer.set_time(mediaPlayer.get_time()-300000)
 	#if it changes state to ended that means it went too far in a direction... I think
 	mediaPlayer.set_pause(False)
+	
+	return render_template("base.json", status=True)
 	
 	
 	
@@ -74,14 +95,31 @@ def setVolume(volume):
 	
 @app.route("/YTDownload")
 def YTDownload():
-	return None #start the download and set the path.txt to the path. Create lock file for polling, TY.lock. Delete when done....
+	if path.isfile(app.root_path+"/path.txt") is not True:
+		return render_template("base.json", status=False)
+	
+	mediaURL = open(app.root_path+"/path21.txt").readline()
+	
+	#verify url!
+	#create lock file
+	#popen?
+	
+	app.download = Popen(["youtube-dl.exe", mediaURL, "-o", "./content/local-media/YouTube Videos/%(title)s.%(ext)s", "--restrict-filenames"])
+	return render_template("base.json", status=True)
+	#start the download and set the path.txt to the path. Create lock file for polling, TY.lock. Delete when done....
 	#maybe jut tell by weather the video is in the correct place. this then would need to be async.
 	#Could also have a buffering gif and have it say that it will appear in the folder and they should select it
 	
 @app.route("/isDownloading")
 def isDownloading():
-	if path.isfile(app.root_path+"/TY.lock")
-		
+	if app.download is None:
+		return render_template("base.json", status=False)
+	if app.download.poll() is None:
+		result = "true"
+	else:
+		result = "false"
+	return render_template("base.json", status=False, payload='"isDownloading":'+result)
+	
 	
 	
 	
@@ -122,21 +160,28 @@ def isDownloading():
 #------------------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------------------
+
 @app.context_processor
 def utility_processor():
-    def listLocalMedia(path=app.media_path):
-        return os.listdir(path)
-    return dict(
-		listLocalMedia=listLocalMedia
-	)
-	
-@app.context_processor
-def utility_processor():
-    def getFileExt(path):
+	def listLocalMedia(path=app.media_path):
+		return os.listdir(path)
+		
+	def getFileExt(path):
 		filePath, fileExt = path.splittext(path)
 		return fileExt
-    return dict(
-		getFileExt=getFileExt
+		
+	def jsonSuccessEval(bool):
+		if bool:
+			return "true"
+		elif not bool:
+			return "false"
+		else:
+			return '"template error"'
+		
+	return dict(
+		getFileExt=getFileExt,
+		listLocalMedia=listLocalMedia,
+		jsonSuccessEvaluation=jsonSuccessEval
 	)
 	
 if __name__ == '__main__':

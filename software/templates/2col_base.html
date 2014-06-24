@@ -56,8 +56,8 @@
 					$("#weatherLocation .coordinates").text(weatherData.city.coord.lat+", "+weatherData.city.coord.lon);
 				},
 				'fillTodaysForcast': function (){
-					$("#todaysForcast .tempColumn .maxTemp").text("Max: "+weatherData.list[0].temp.max);
-					$("#todaysForcast .tempColumn .minTemp").text("Min: "+weatherData.list[0].temp.min);
+					$("#todaysForcast .tempColumn .maxTemp").text("Min Temp: "+weatherData.list[0].temp.min);
+					$("#todaysForcast .tempColumn .minTemp").text("Max Temp: "+weatherData.list[0].temp.max);
 				},
 				'fillWeekForcast': function (){
 					var forcast = $("#weekForcast");

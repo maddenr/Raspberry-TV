@@ -1,5 +1,5 @@
 /software/content/*
 /software/pythontrix.*
-/software/path.txt.*
+/software/path*.txt
 /software/vlc.log
 /software/*.pyc
