@@ -106,9 +106,20 @@ button#localMediaStream {
 	height: 25%;
 }
 
-#weekForcast {
+#weekForcastLeft, #weekForcastRight {
 	height: 60%;
+	font-size: 19px;
 }
+#weekForcastLeft {
+	margin-left: 5%;
+	float: left;
+}
+
+#weekForcastRight {
+	margin-right: 5%;
+	float: right;
+}
+
 
 #modalWindow {
 	background-color: rgba(0,0,0,.2);

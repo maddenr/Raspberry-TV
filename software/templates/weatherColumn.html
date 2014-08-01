@@ -1,0 +1,65 @@
+<div id="todaysForcast">
+	<div class="weatherGraphic">
+		<img src="{{ url_for('static', filename='images/'+weatherData['list'][0]['weather'][0]['icon']+'.png') }}" style="width:10%;vertical-align:middle;">
+		<h3 style="display:inline;">
+			{{ forcastDays.pop() }}
+		</h3>
+	</div>
+	<div class="tempColumn">
+		<h2 class="minTemp">
+			Min: {{ weatherData['list'][0]['temp']['min'] }}
+		</h2>
+		<h2 class="maxTemp">
+			Max: {{ weatherData['list'][0]['temp']['max'] }}
+		</h2>
+	</div>
+</div>
+<table id="weekForcastLeft">
+	<tbody>
+		{% for i in weatherData['list'][1:4] %}
+		<tr>
+			<td>
+				<center>
+				{{ forcastDays.pop() }}
+				</center>
+			</td>
+			<td>
+				<img src="{{ url_for('static', filename='images/'+i['weather'][0]['icon']+'.png') }}" style="max-width:125%;width:125%;">
+			</td>
+			<td>
+				<div>
+					Min: {{ i['temp']['min'] }}
+				</div>
+				<div>
+					Max: {{ i['temp']['max'] }}
+				</div>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<table id="weekForcastRight">
+	<tbody>
+		{% for j in weatherData['list'][4:] %}
+		<tr>
+			<td>
+				<center>
+					{{ forcastDays.pop() }}
+				</center>
+			</td>
+			<td>
+				<img src="{{ url_for('static', filename='images/'+j['weather'][0]['icon']+'.png') }}" style="max-width:125%;width:125%;">
+			</td>
+			<td>
+				<div>
+					Min: {{ j['temp']['min'] }}
+				</div>
+				<div>
+					Max: {{ j['temp']['max'] }}
+				</div>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

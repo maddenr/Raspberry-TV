@@ -1,9 +1,13 @@
-from flask import Flask, render_template, abort, send_file
+from flask import Flask, render_template, abort, send_file, request, redirect
 import os.path as path
 import os
 import re
 import vlc
 from subprocess import call, Popen
+import json
+import pprint
+from datetime import date
+pp = pprint.PrettyPrinter(indent=4)
 app = Flask(__name__)
 app.root_path = path.abspath(path.dirname(__file__)).replace("\\","/")
 app.media_path = app.root_path+"/content/local-media"#path.join(app.root_path, "content", "local-media")
@@ -122,7 +126,23 @@ def isDownloading():
 	
 	
 	
-	
+@app.route("/weatherColumn", methods=['GET', 'POST'])
+def weatherColumn():
+	if request is None:
+		print "blah"
+		return render_template("base.json", status=False)
+	else:
+		today = date.today()
+		forcastDays = [
+			date.fromordinal(today.toordinal()+6).strftime("%A"),
+			date.fromordinal(today.toordinal()+5).strftime("%A"),
+			date.fromordinal(today.toordinal()+4).strftime("%A"),
+			date.fromordinal(today.toordinal()+3).strftime("%A"),
+			date.fromordinal(today.toordinal()+2).strftime("%A"),
+			date.fromordinal(today.toordinal()+1).strftime("%A"),
+			today.strftime("%A, %d. %B %Y")
+		]
+		return render_template("weatherColumn.html", weatherData=json.loads(request.form['data']), forcastDays = forcastDays)#
 	
 	
 	
