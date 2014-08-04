@@ -4,3 +4,5 @@
 /software/path*.txt
 /software/vlc.log
 /software/*.pyc
+/software/omxlog.txt
+*.log

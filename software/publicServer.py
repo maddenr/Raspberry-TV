@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, abort
 import json
 import os.path as path
 from os import listdir, walk
@@ -6,7 +6,8 @@ import socket
 from threading import Thread
 from subprocess import Popen, PIPE
 from time import sleep
-import urllib
+import fcntl
+import struct
 app = Flask(__name__)
 
 
@@ -118,7 +119,8 @@ def decVol():
 @app.route("/listLocalMedia/<path:desiredPath>")
 def localMediaFiles(desiredPath):
 	desiredPath = desiredPath.replace("~", app.media_path)
-	if path.isfile(app.root_path+"/path.txt") is not True:
+	print desiredPath
+	if not path.exists(desiredPath):
 		return render_template("base.json", status=False, payload='"reason":"no file"')
 	files = []
 	dirs = []
@@ -135,8 +137,8 @@ def localMediaFiles(desiredPath):
 def YTDownload():
 	if request is None:
 		return render_template("base.json", status=False)
-	mediaURL = app.media_path+"/"+request.form['url']
-	YTDownload = Popen(["youtube-dl", mediaURL, "-o", "./content/local-media/YouTube Videos/%(title)s.%(ext)s", "--restrict-filenames"])
+
+	YTDownload = Popen(["youtube-dl", request.form['url'], "-o", "./content/local-media/YouTube Videos/%(title)s.%(ext)s", "--restrict-filenames"])
 	return render_template("base.json", status=True)
 
 @app.route("/isConnected/")
@@ -148,6 +150,7 @@ def isConnected():
 def fib():
 	with open("command.txt", "w+") as file:
 		file.write("k")
+	print "HERP DERP YEARAERARARARP"
 	request.environ.get('werkzeug.server.shutdown')()
 	return
 
@@ -174,9 +177,13 @@ def utility_processor():
 		jsonSuccessEvaluation=jsonSuccessEval
 	)
 
+def get_interface_ip(ifname):
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))[20:24])
+
 def start():
 	global myIP
-	myIP = urllib.urlopen("http://myip.dnsdynamic.org").read()
+	myIP = get_interface_ip("wlan0")#change for ethernet to eth0
 	print "Connect to: "+myIP+":5000"
 	app.run(host="0.0.0.0")
 
