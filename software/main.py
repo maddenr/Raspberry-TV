@@ -68,8 +68,8 @@ if __name__ =='__main__':
 	try:
 		PublicServerThread.start()
 		OMXThread.start()
-		sleep(2)
-#		BrowserThread.start()
+		sleep(4)
+		BrowserThread.start()
 	except Exception as e:
 		print "********************"
 		print e

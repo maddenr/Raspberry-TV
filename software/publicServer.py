@@ -8,6 +8,7 @@ from subprocess import Popen, PIPE
 from time import sleep
 import fcntl
 import struct
+from datetime import date
 app = Flask(__name__)
 
 
@@ -20,10 +21,11 @@ myIP = None
 @app.route("/")
 #return the app itself
 def index():
+	global myIP
 	if request.remote_addr != "127.0.0.1":
 		abort(403)
 	#add IP
-	return render_template("2col_base.html")
+	return render_template("2col_base.html", ip=myIP)
 
 @app.route("/weatherColumn", methods=['GET', 'POST'])
 def weatherColumn():
@@ -137,8 +139,8 @@ def localMediaFiles(desiredPath):
 def YTDownload():
 	if request is None:
 		return render_template("base.json", status=False)
-
-	YTDownload = Popen(["youtube-dl", request.form['url'], "-o", "./content/local-media/YouTube Videos/%(title)s.%(ext)s", "--restrict-filenames"])
+	YTDownload = Popen(["python", "ytd.py", request.form['url']])
+#	YTDownload = Popen(["youtube-dl", request.form['url'], "-o", "./content/local-media/YouTube Videos/%(title)s.%(ext)s", "--restrict-filenames"])
 	return render_template("base.json", status=True)
 
 @app.route("/isConnected/")

@@ -1,5 +1,6 @@
+/software/content/local-media/YouTube Videos/*.mp4
+/software/content/local-media/*.mp*
 /software/dummyserver.*
-/software/content/*
 /software/pythontrix.*
 /software/path*.txt
 /software/vlc.log

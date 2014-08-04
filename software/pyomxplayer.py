@@ -14,7 +14,7 @@ class OMXPlayer(object):
     _DONE_REXP = re.compile(r"have a nice day.*")
     _LENGTH_REXP = re.compile(r".*Duration: (\d\d:\d\d:\d\d.\d\d).*", re.DOTALL | re.MULTILINE)
 
-    _LAUNCH_CMD = '/usr/bin/omxplayer -s %s %s' #add -b for good looks, start with start_playback=True
+    _LAUNCH_CMD = '/usr/bin/omxplayer -s -b %s %s' #add -b for good looks, start with start_playback=True
     _PAUSE_CMD = 'p'
     _TOGGLE_SUB_CMD = 's'
     _QUIT_CMD = 'q'
@@ -32,7 +32,7 @@ class OMXPlayer(object):
     def __init__(self, mediafile, args=None, start_playback=True):
         if not args:
             args = ""
-        cmd = self._LAUNCH_CMD % (mediafile.replace("%20", " "), args)
+        cmd = self._LAUNCH_CMD % ('"%s"' % mediafile.replace("%20", " "), args)
         self.position = None
 	self.paused = False
 	self.subtitles_visible = True
