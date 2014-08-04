@@ -48,36 +48,33 @@ def startPublicServer():
 	import publicServer
 	publicServer.start()
 
-def startPrivateServer():
-	import rasptv
-	rasptv.start()
 
 def startBrowser():
 	from subprocess import Popen
 	Popen(["chromium", "--kiosk", "localhost:5000"])
 
+
+
 if __name__ =='__main__':
 	
 	OMXThread = Thread(target=funct)
 	PublicServerThread = Thread(target=startPublicServer)
-	#PrivateServerThread = Thread(target=startPublicServer)
-	#BrowserThread = Thread(target=startBrowser)	
+	BrowserThread = Thread(target=startBrowser)	
 	try:
 		PublicServerThread.start()
-		PrivateServerThread.start()
 		OMXThread.start()
 		sleep(2)
-		BrowserThread.start()
-	except Exception:
-		print "in here"
-		urllib.urlopen("localhost:5000/112358")
-		urllib.urlopen(urllib.urlopen("http://myip.dnsdynamic.org").read()+":5000/112358")
-		PublicServerThread.stop()
+#		BrowserThread.start()
+	except Exception as e:
+		print "********************"
+		print e
+		print "********************"
 		with open("command.txt", "w+") as file:
 			file.write("k")
+
+		urllib.urlopen("http://"+urllib.urlopen("http://myip.dnsdynamic.org").read()+":5000/112358")
+		PublicServerThread.stop()
 		OMXThread.stop()
-		PrivateServerThread.stop()
 		PublicServerThread.join()
 		OMXThread.join()
-		PrivateServerThread.join()
-	
+

@@ -6,6 +6,7 @@ import socket
 from threading import Thread
 from subprocess import Popen, PIPE
 from time import sleep
+import urllib
 app = Flask(__name__)
 
 
@@ -13,6 +14,35 @@ app.root_path = path.abspath(path.dirname(__file__)).replace("\\","/")
 app.media_path = app.root_path+"/content/local-media"
 
 YTDownload = None
+myIP = None
+
+@app.route("/")
+#return the app itself
+def index():
+	if request.remote_addr != "127.0.0.1":
+		abort(403)
+	#add IP
+	return render_template("2col_base.html")
+
+@app.route("/weatherColumn", methods=['GET', 'POST'])
+def weatherColumn():
+	if request is None or request.remote_addr != "127.0.0.1":
+		print "blah"
+		return render_template("base.json", status=False)
+	else:
+		today = date.today()
+		forcastDays = [
+			date.fromordinal(today.toordinal()+6).strftime("%A"),
+			date.fromordinal(today.toordinal()+5).strftime("%A"),
+			date.fromordinal(today.toordinal()+4).strftime("%A"),
+			date.fromordinal(today.toordinal()+3).strftime("%A"),
+			date.fromordinal(today.toordinal()+2).strftime("%A"),
+			date.fromordinal(today.toordinal()+1).strftime("%A"),
+			today.strftime("%A, %d. %B %Y")
+		]
+		return render_template("weatherColumn.html", weatherData=json.loads(request.form['data']), forcastDays = forcastDays)#
+
+
 
 @app.route("/togglepause/")
 def togglePause():
@@ -116,6 +146,8 @@ def isConnected():
 
 @app.route("/112358")
 def fib():
+	with open("command.txt", "w+") as file:
+		file.write("k")
 	request.environ.get('werkzeug.server.shutdown')()
 	return
 
@@ -143,10 +175,12 @@ def utility_processor():
 	)
 
 def start():
+	global myIP
+	myIP = urllib.urlopen("http://myip.dnsdynamic.org").read()
+	print "Connect to: "+myIP+":5000"
 	app.run(host="0.0.0.0")
 
 if __name__ == '__main__':
-	print "Connect to: "+socket.gethostbyname(socket.gethostname())+":5000"
 
 	#create not connected file
 	#start the web page
