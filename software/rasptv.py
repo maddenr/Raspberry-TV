@@ -2,7 +2,6 @@ from flask import Flask, render_template, abort, send_file, request, redirect
 import os.path as path
 import os
 import re
-import vlc
 from subprocess import call, Popen
 import json
 import pprint
@@ -14,9 +13,7 @@ app.media_path = app.root_path+"/content/local-media"#path.join(app.root_path, "
 #create custom 404 page for friendly faults and then have an ajax for internet connection check (succeed reload old url, failure report)
 streams = [ ('localMedia', 'images/local-media-icon.png'),
 		('youtube', 'images/youtube-icon.png')  ]
-		
-i = vlc.Instance("--video-on-top")
-mediaPlayer = i.media_player_new()
+
 app.download = None
 
 @app.route("/")
@@ -27,23 +24,23 @@ def index():
 	
 @app.route("/mediaPlayerAction/<string:action>")
 def mediaPlayerAction(action):
-	if action == "play":
-		if mediaPlayer.get_state() == vlc.State.Ended:
-			mediaPlayer.stop()
-		if mediaPlayer.get_state() == vlc.State.Stopped:
-			mediaPlayer.play()
-		else:
-			mediaPlayer.set_pause(False)
-	elif action == "pause":
-		mediaPlayer.set_pause(True)
-	elif action == "stop":
-		mediaPlayer.stop()
-	elif action == "mute":
-		mediaPlayer.audio_set_mute(True)
-	elif action == "unmute":
-		mediaPlayer.audio_set_mute(False)
-	else:
-		return render_template("base.json", status=False)
+#	if action == "play":
+#		if mediaPlayer.get_state() == vlc.State.Ended:
+#			mediaPlayer.stop()
+#		if mediaPlayer.get_state() == vlc.State.Stopped:
+#			mediaPlayer.play()
+#		else:
+#			mediaPlayer.set_pause(False)
+#	elif action == "pause":
+#		mediaPlayer.set_pause(True)
+#	elif action == "stop":
+#		mediaPlayer.stop()
+#	elif action == "mute":
+#		mediaPlayer.audio_set_mute(True)
+#	elif action == "unmute":
+#		mediaPlayer.audio_set_mute(False)
+#	else:
+#		return render_template("base.json", status=False)
 	return render_template("base.json", status=True)
 
 	
@@ -51,19 +48,19 @@ def mediaPlayerAction(action):
 	
 @app.route("/loadMedia")
 def loadMedia():
-	if path.isfile(app.root_path+"/path.txt") is not True:
-		return render_template("base.json", status=False, payload='"reason":"no file"')
+#	if path.isfile(app.root_path+"/path.txt") is not True:
+#		return render_template("base.json", status=False, payload='"reason":"no file"')
 		
-	mediaPath = app.media_path+"/"+open(app.root_path+"/path.txt").readline()
+#	mediaPath = app.media_path+"/"+open(app.root_path+"/path.txt").readline()
 	
-	if path.isfile(mediaPath) is not True:
-		return render_template("base.json", status=False, payload='"reason":"media not there"')
-	elif mediaPlayer.get_state() is not vlc.State.Ended:
-		mediaPlayer.stop()
+#	if path.isfile(mediaPath) is not True:
+#		return render_template("base.json", status=False, payload='"reason":"media not there"')
+#	elif mediaPlayer.get_state() is not vlc.State.Ended:
+#		mediaPlayer.stop()
 		
-	mediaPlayer.set_media(i.media_new("file:///"+mediaPath))
-	mediaPlayer.play()
-	mediaPlayer.set_fullscreen(True)
+#	mediaPlayer.set_media(i.media_new("file:///"+mediaPath))
+#	mediaPlayer.play()
+#	mediaPlayer.set_fullscreen(True)
 	return render_template("base.json", status=True)
 	# return JSON response
 	#make sure that things are displayed alphabetically, use numbers to sort track numbers... this is where we add tracks to play and album
@@ -71,22 +68,22 @@ def loadMedia():
 	
 @app.route("/setVolume/<int:volume>")
 def setVolume(volume):
-	mediaPlayer.audio_set_volume(volume)
+#	mediaPlayer.audio_set_volume(volume)
 	return render_template("base.json", status=True)
 	
 	
 @app.route("/skipPlaybackInterval/<string:direction>")
 def skipPlayback(direction):
-	if mediaPlayer.get_state() == vlc.State.NothingSpecial:
-		return render_template("base.json", status=False)
+#	if mediaPlayer.get_state() == vlc.State.NothingSpecial:
+#		return render_template("base.json", status=False)
 	
 	#mediaPlayer.set_pause(True)
-	if direction == "forward":
-		mediaPlayer.set_time(mediaPlayer.get_time()+300000)
-	elif direction == "backward":
-		mediaPlayer.set_time(mediaPlayer.get_time()-300000)
+#	if direction == "forward":
+#		mediaPlayer.set_time(mediaPlayer.get_time()+300000)
+#	elif direction == "backward":
+#		mediaPlayer.set_time(mediaPlayer.get_time()-300000)
 	#if it changes state to ended that means it went too far in a direction... I think
-	mediaPlayer.set_pause(False)
+#	mediaPlayer.set_pause(False)
 	
 	return render_template("base.json", status=True)
 	
@@ -143,44 +140,13 @@ def weatherColumn():
 			today.strftime("%A, %d. %B %Y")
 		]
 		return render_template("weatherColumn.html", weatherData=json.loads(request.form['data']), forcastDays = forcastDays)#
-	
-	
-	
-	
-	
-	
-	#DEPRECIATED!!
-# @app.route("/localMedia/<path:mediaPath>")
-# #return the proper local media		depreciated? use modal window
-# def getLocalMedia(mediaPath):
-	# mediaPath = path.join(app.media_path, mediaPath)
-	# print "BLAHHHHHHH"
-	# print mediaPath
-	# if path.isfile(mediaPath) is False:
-		# print "rugs"+str(path.isfile(mediaPath))
-		# abort(404)
-	# else:
-		# print mediaPath.replace('\\','/')
-		# return app.send_static_file("wazzlejazzlebof.mp3")#send_file(mediaPath, cache_timeout=600)
-		
 
-		#DEPRECIATED!!
-# @app.route("/modalWindow/<string:type>")
-# #return the proper local media
-# #give path in POST
-# def getModalWindow(type):
-	# print path.join(app.root_path,"path.txt")
-	# if path.isfile(path.join(app.root_path,"path.txt")) is False:
-		# abort(404)
-	# file = open("path.txt")
-	# return render_template(type+"Modal.html", path="localMedia/"+file.readline())#might have /n at the end
-
-#list local media handler
-# 1 level deep for now... can do more folders later
-#------------------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------------------
-
+@app.route("/112358")
+def fib():
+	request.environ.get('werkzeug.server.shutdown')()
+	return
+	
+	
 @app.context_processor
 def utility_processor():
 	def listLocalMedia(path=app.media_path):
@@ -203,6 +169,8 @@ def utility_processor():
 		listLocalMedia=listLocalMedia,
 		jsonSuccessEvaluation=jsonSuccessEval
 	)
-	
+def start():
+	app.run()
+
 if __name__ == '__main__':
-	app.run(debug=True)
+	start()

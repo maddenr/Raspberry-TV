@@ -29,12 +29,13 @@ class OMXPlayer(object):
     paused = False
     subtitles_visible = True
 
-    def __init__(self, mediafile, args=None, start_playback=False):
+    def __init__(self, mediafile, args=None, start_playback=True):
         if not args:
             args = ""
         cmd = self._LAUNCH_CMD % (mediafile, args)
         self.position = None
-
+	self.paused = False
+	self.subtitles_visible = True
         self.video = dict()
         self.audio = dict()
 
@@ -51,7 +52,7 @@ class OMXPlayer(object):
         except Exception as e:
             print ("Error with finding length %s" % e)
 
-        self._process = pexpect.spawn(cmd)
+        self._process = pexpect.spawn(cmd, logfile=open('omxlog.txt', 'w'))
         self._start_time = time() #1 second buffer -1
 
         try:
@@ -108,8 +109,10 @@ class OMXPlayer(object):
         return float(parts[2]) + (int(parts[1])*60) + (int(parts[0])*3600)
 
     def toggle_pause(self):
-        if self._process.send(self._PAUSE_CMD):
+        BW = self._process.send(self._PAUSE_CMD)
+        if BW:
             self.paused = not self.paused
+        print BW
 
     def toggle_subtitles(self):
         if self._process.send(self._TOGGLE_SUB_CMD):
@@ -120,8 +123,10 @@ class OMXPlayer(object):
 
     def increase_volume(self):
         self._process.send(self._INC_VOL)
+        self._process.send(self._INC_VOL)
 
     def decrease_volume(self):
+        self._process.send(self._DEC_VOL)
         self._process.send(self._DEC_VOL)
 
     def rewind_30(self):

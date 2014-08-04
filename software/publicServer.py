@@ -3,55 +3,86 @@ import json
 import os.path as path
 from os import listdir, walk
 import socket
-from pyomxplayer import OMXPlayer
 from threading import Thread
-
+from subprocess import Popen, PIPE
+from time import sleep
 app = Flask(__name__)
+
 
 app.root_path = path.abspath(path.dirname(__file__)).replace("\\","/")
 app.media_path = app.root_path+"/content/local-media"
 
-OMX = None
 YTDownload = None
 
 @app.route("/togglepause/")
 def togglePause():
-	OMX.toggle_pause()
+	if path.isfile("command.txt"):
+		sleep(.700)
+	with open("command.txt", "w+") as file:
+		file.write("p")
 	return render_template("base.json", status = True)
 	
 @app.route("/loadMedia/<path:mediaPath>")
 def loadMedia(mediaPath):
-	if OMXPlayer is not None:
-		OMX.stop()
-	OMX = OMXPlayer(mediaPath, start_playback=True)
+	if path.isfile("command.txt"):
+		sleep(.700)
+	print app.media_path+"/"+mediaPath
+	with open("command.txt", "w+") as file:
+		file.write(mediaPath)
+
 	return render_template("base.json", status = True)
 	
 @app.route("/stop/")
 def stop():
-	if OMXPlayer is not None:
-		OMX.stop()
-		OMX = None
+	if path.isfile("command.txt"):
+		sleep(.700)
+	with open("command.txt", "w+") as file:
+		file.write("s")
+	
 	return render_template("base.json", status=True)
 	
 	
 @app.route("/seek/<string:direction>/<int:value>/")
 def seek(direction, value):
+	if path.isfile("command.txt"):
+		sleep(.700)
+
 	if direction == "ff":
 		if value == 30:
-			OMX.fast_forward_30()
+			command = "+30"
 		elif value == 600:
-			OMX.fast_forward_600()
+			command = "+600"
 	elif direction == "rewind":
 		if value == 30:
-			OMX.rewind_30()
+			command = "-30"
 		elif value == 600:
-			OMX.rewind_600()
+			command = "-600"
 	else:
 		return render_template("base.json", status=False)
-	
+	with open("command.txt", "w+") as file:
+		file.write(command)
+
 	return render_template("base.json", status=True)
 
-	
+@app.route("/increaseVolume/")
+def incVol():
+	if path.isfile("command.txt"):
+		sleep(.700)
+	with open("command.txt", "w+") as file:
+		file.write("+")
+
+	return render_template("base.json", status=True)
+
+
+@app.route("/decreaseVolume/")
+def decVol():
+	if path.isfile("command.txt"):
+		sleep(.700)
+	with open("command.txt", "w+") as file:
+		file.write("-")
+
+	return render_template("base.json", status=True)
+
 	
 #write the path relative to ~, where ~ is the root of the local media folder
 @app.route("/listLocalMedia/<path:desiredPath>")
@@ -71,10 +102,22 @@ def localMediaFiles(desiredPath):
 	return render_template("base.json", status=True, payload=jsonData[1:-1])#trim ends
 	
 @app.route("/YTDownload/", methods=['POST'])
+def YTDownload():
 	if request is None:
 		return render_template("base.json", status=False)
-	YTDownload = Popen(["youtube-dl.exe", mediaURL, "-o", "./content/local-media/YouTube Videos/%(title)s.%(ext)s", "--restrict-filenames"])
+	mediaURL = app.media_path+"/"+request.form['url']
+	YTDownload = Popen(["youtube-dl", mediaURL, "-o", "./content/local-media/YouTube Videos/%(title)s.%(ext)s", "--restrict-filenames"])
+	return render_template("base.json", status=True)
 
+@app.route("/isConnected/")
+def isConnected():
+	#remove the not connected file
+	return render_template("base.json", success=True)
+
+@app.route("/112358")
+def fib():
+	request.environ.get('werkzeug.server.shutdown')()
+	return
 
 @app.context_processor
 def utility_processor():
@@ -98,8 +141,14 @@ def utility_processor():
 		listLocalMedia=listLocalMedia,
 		jsonSuccessEvaluation=jsonSuccessEval
 	)
-	
+
+def start():
+	app.run(host="0.0.0.0")
+
 if __name__ == '__main__':
 	print "Connect to: "+socket.gethostbyname(socket.gethostname())+":5000"
+
+	#create not connected file
 	#start the web page
-	app.run(host="0.0.0.0" )
+	#app.run(host="0.0.0.0" )
+	start()
