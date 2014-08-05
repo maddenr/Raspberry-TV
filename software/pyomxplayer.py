@@ -52,7 +52,7 @@ class OMXPlayer(object):
         except Exception as e:
             print ("Error with finding length %s" % e)
 
-        self._process = pexpect.spawn(cmd, logfile=open('omxlog.txt', 'w'))
+        self._process = pexpect.spawn(cmd)
         self._start_time = time() #1 second buffer -1
 
 
