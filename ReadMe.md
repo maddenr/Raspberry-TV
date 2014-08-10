@@ -4,14 +4,10 @@ WIT Senior Project - Raspberry TV
 
 This project's main goal was to provide some limited smart TV functionality via a raspberry pi.
 
-The orginally stated goals were:
-An app which would push commands to a public server
-A local server which would display the smart TV splash screen
-Normal TV controls:
-- Volume up/down
-- fast forward/rewind
-- Play/Pause
-- Stop
+The originally stated goals were
+- An app which would push commands to a public server and cover youtube video search
+- A local server which would display the smart TV splash screen
+- Normal TV controls (Volume up/down/fast forward/rewind/Play/Pause/Stop)
 
 In addition to playing local media, one can download YouTube videos.
 The YouTube downloading comes from a utility called youtube-dl (the windows .exe is given, linux version can be downloaded via apt-get)
@@ -32,3 +28,8 @@ Development will continue as this application is used in my home. Late night cod
 
 There is a good deal of depreciated JS on the front end because of the abandoned keyboard default and the raspberry pi/chromiums inability to handle by JS background and visualizer (for mp3s) which had horrible color banding and issues rendering the elements (I believe chromium is unintentionally doing something nonstandard, I will explore other chromium packages).
 In addition, the rasptv.py file (which was the local web server) has been built into the publicServer.py and it's code still exists for reference.
+
+To install the dependencies use this command and everything should work, provided they install correctly.
+<code>
+sudo apt-get install python-flask && sudo apt-get install youtube-dl && sudo apt-get install python-pexpect
+</code>
