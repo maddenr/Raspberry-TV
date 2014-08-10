@@ -1,5 +1,5 @@
 /software/content/local-media/YouTube Videos/*.mp4
-/software/content/local-media/*.mp*
+/software/content/local-media/*
 /software/dummyserver.*
 /software/pythontrix.*
 /software/path*.txt
